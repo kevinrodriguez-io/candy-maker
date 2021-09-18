@@ -129,7 +129,6 @@ var TOTAL_BOY = 1500;
 var ALL_BOY = [];
 var CURRENT_BOY_CONSECUTIVE = 0;
 var getLayerUri = function (pseudoGender, layerType, layerName) {
-    // const layerUri = `./layers/${pseudoGender}/${layerType}/${layerName}.png`;
     var layerUri = path.resolve(__dirname, "layers", pseudoGender, layerType, layerName + "." + (layerType === "background" ? "jpg" : "png"));
     spinner.info("Got layerUri: " + layerUri);
     return "" + layerUri;

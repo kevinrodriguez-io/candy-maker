@@ -54,7 +54,6 @@ const JSON_TEMPLATE = {
 spinner.succeed();
 
 spinner.start("Creating layers and weights");
-//#region Male stuff
 
 const backgrounds = [
   "baby_pink",
@@ -65,13 +64,15 @@ const backgrounds = [
 ];
 const background_weights = [20, 20, 20, 20, 20];
 
-const bodies = ["body_1", "body_2", "body_3", "body_4"];
-const body_weights = [25, 25, 25, 25];
+// #region Boy stuff
 
-const footwear = ["blue", "green", "orange", "red", "white"];
-const footwear_weights = [35, 35, 15, 10, 5];
+const boy_bodies = ["body_1", "body_2", "body_3", "body_4"];
+const boy_body_weights = [25, 25, 25, 25];
 
-const pants = [
+const boy_footwear = ["blue", "green", "orange", "red", "white"];
+const boy_footwear_weights = [35, 35, 15, 10, 5];
+
+const boy_pants = [
   "black_jeans",
   "black_pants",
   "blue_jeans",
@@ -79,9 +80,9 @@ const pants = [
   "gray_joggers",
   "khaki_pants",
 ];
-const pant_weights = [5, 15, 35, 15, 20, 10];
+const boy_pant_weights = [5, 15, 35, 15, 20, 10];
 
-const hairs = [
+const boy_hairs = [
   "black_mohawk_beard",
   "long_black",
   "long_brown",
@@ -90,9 +91,9 @@ const hairs = [
   "short_blonde_beard",
   "short_blonde",
 ];
-const hair_weights = [8, 30, 5, 5, 3, 19, 30];
+const boy_hair_weights = [8, 30, 5, 5, 3, 19, 30];
 
-const shirts = [
+const boy_shirts = [
   "black_shirt",
   "black_solana",
   "brown_shirt",
@@ -100,9 +101,9 @@ const shirts = [
   "white_shirt",
   "white_tank_top",
 ];
-const shirt_weights = [7, 3, 15, 20, 30, 25];
+const boy_shirt_weights = [7, 3, 15, 20, 30, 25];
 
-const eyewear = [
+const boy_eyewear = [
   "black_sunglasses",
   "black_eyepatch",
   "glasses",
@@ -111,9 +112,9 @@ const eyewear = [
   "none",
 ];
 
-const eyewear_weights = [15, 10, 15, 5, 20, 35];
+const boy_eyewear_weights = [15, 10, 15, 5, 20, 35];
 
-const sweaters = [
+const boy_sweaters = [
   "black_sweater",
   "black_white_pattern",
   "red_sweater",
@@ -121,7 +122,13 @@ const sweaters = [
   "no_sweater",
 ];
 
-const sweater_weights = [15, 5, 15, 10, 55];
+const boy_sweater_weights = [15, 5, 15, 10, 55];
+
+//#endregion
+
+//#region Girl stuff
+
+//#endregion
 
 spinner.succeed();
 
@@ -134,7 +141,6 @@ const getLayerUri = (
   layerType: LayerType,
   layerName: string
 ) => {
-  // const layerUri = `./layers/${pseudoGender}/${layerType}/${layerName}.png`;
   const layerUri = path.resolve(
     __dirname,
     "layers",
@@ -151,13 +157,13 @@ const createBoyNFT = async () => {
   const chance = new Chance();
 
   const backgroundItem = chance.weighted(backgrounds, background_weights);
-  const bodyItem = chance.weighted(bodies, body_weights);
-  const footwearItem = chance.weighted(footwear, footwear_weights);
-  const pantItem = chance.weighted(pants, pant_weights);
-  const shirtItem = chance.weighted(shirts, shirt_weights);
-  const sweaterItem = chance.weighted(sweaters, sweater_weights);
-  const eyewearItem = chance.weighted(eyewear, eyewear_weights);
-  const hairItem = chance.weighted(hairs, hair_weights);
+  const bodyItem = chance.weighted(boy_bodies, boy_body_weights);
+  const footwearItem = chance.weighted(boy_footwear, boy_footwear_weights);
+  const pantItem = chance.weighted(boy_pants, boy_pant_weights);
+  const shirtItem = chance.weighted(boy_shirts, boy_shirt_weights);
+  const sweaterItem = chance.weighted(boy_sweaters, boy_sweater_weights);
+  const eyewearItem = chance.weighted(boy_eyewear, boy_eyewear_weights);
+  const hairItem = chance.weighted(boy_hairs, boy_hair_weights);
   spinner.info(`Using ${backgroundItem} as background`);
   spinner.info(`Using ${bodyItem} as body`);
   spinner.info(`Using ${footwearItem} as footwear`);
@@ -223,8 +229,6 @@ const createBoyNFT = async () => {
     await createBoyNFT();
   } while (CURRENT_BOY_CONSECUTIVE < TOTAL_BOY * 2);
 })();
-
-//#endregion
 
 //#region Female stuff
 
