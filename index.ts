@@ -28,10 +28,10 @@ const spinner = ora("Creating JSON Template").start();
 const JSON_TEMPLATE = {
   name: "",
   symbol: "",
-  image: "0.png",
+  image: "0.jpg",
   description:
     "Someone is coming to the city! Congratulations on getting your ticket to the Metropolis. https://metropolisproject.io",
-  seller_fee_basis_points: 1400, // 1000 = 14%
+  seller_fee_basis_points: 1200, // 1000 = 12%
   attributes: [
     // { trait_type: "web", value: "yes", },
   ] as Attribute[],
@@ -42,7 +42,7 @@ const JSON_TEMPLATE = {
   properties: {
     files: [
       {
-        uri: "image.png",
+        uri: "image.jpg",
         type: "image/png",
       },
     ],
@@ -187,14 +187,14 @@ const girl_shirt_weights = [15, 10, 35, 25, 10, 5];
 
 spinner.succeed();
 
-const TOTAL_BOY = 1500;
+const TOTAL_BOY = 15;
 const ALL_BOY: Array<typeof JSON_TEMPLATE> = [];
 
-const TOTAL_GIRL = 1500;
+const TOTAL_GIRL = 15;
 const ALL_GIRL: Array<typeof JSON_TEMPLATE> = [];
 
 let CURRENT_BOY_CONSECUTIVE = 0;
-let CURRENT_GIRL_CONSECUTIVE = 0;
+let CURRENT_GIRL_CONSECUTIVE = 1;
 
 const getLayerUri = (
   pseudoGender: PseudoGender,
@@ -225,31 +225,31 @@ const createBoyNFT = async () => {
   const accessoryItem = chance.weighted(boy_accessories, boy_accessory_weights);
   const hairItem = chance.weighted(boy_hairs, boy_hair_weights);
 
-  spinner.info(`Using ${backgroundItem} as background`);
-  spinner.info(`Using ${bodyItem} as body`);
-  spinner.info(`Using ${footwearItem} as footwear`);
-  spinner.info(`Using ${pantItem} as pant`);
-  spinner.info(`Using ${shirtItem} as shirt`);
-  spinner.info(`Using ${sweaterItem} as sweater`);
-  spinner.info(`Using ${accessoryItem} as accessory`);
-  spinner.info(`Using ${hairItem} as hair`);
-
-  spinner.info("Writing .png file");
-  images(getLayerUri("boy", "background", backgroundItem))
-    .draw(images(getLayerUri("boy", "body", bodyItem)), 0, 0)
-    .draw(images(getLayerUri("boy", "footwear", footwearItem)), 0, 0)
-    .draw(images(getLayerUri("boy", "pant", pantItem)), 0, 0)
-    .draw(images(getLayerUri("boy", "shirt", shirtItem)), 0, 0)
-    .draw(images(getLayerUri("boy", "sweater", sweaterItem)), 0, 0)
-    .draw(images(getLayerUri("boy", "accessory", accessoryItem)), 0, 0)
-    .draw(images(getLayerUri("boy", "hair", hairItem)), 0, 0)
-    .save(
-      path.resolve(
-        __dirname,
-        "output",
-        `${CURRENT_BOY_CONSECUTIVE.toString()}.jpg`
+  spinner.info("Writing .jpg file");
+  await new Promise<void>((res, reject) =>
+    images(getLayerUri("boy", "background", backgroundItem))
+      .draw(images(getLayerUri("boy", "body", bodyItem)), 0, 0)
+      .draw(images(getLayerUri("boy", "footwear", footwearItem)), 0, 0)
+      .draw(images(getLayerUri("boy", "pant", pantItem)), 0, 0)
+      .draw(images(getLayerUri("boy", "shirt", shirtItem)), 0, 0)
+      .draw(images(getLayerUri("boy", "sweater", sweaterItem)), 0, 0)
+      .draw(images(getLayerUri("boy", "accessory", accessoryItem)), 0, 0)
+      .draw(images(getLayerUri("boy", "hair", hairItem)), 0, 0)
+      .saveAsync(
+        path.resolve(
+          __dirname,
+          "output",
+          `${CURRENT_BOY_CONSECUTIVE.toString()}.jpg`
+        ),
+        (err) => {
+          if (err) {
+            reject(err);
+          } else {
+            res();
+          }
+        }
       )
-    );
+  );
 
   spinner.info("Writing .json file");
   const templateClone = JSON.parse(
@@ -270,7 +270,7 @@ const createBoyNFT = async () => {
     { trait_type: "accessory", value: accessoryItem },
     { trait_type: "hair", value: hairItem },
   ];
-  templateClone.image = `${CURRENT_BOY_CONSECUTIVE}.png`;
+  templateClone.image = `${CURRENT_BOY_CONSECUTIVE}.jpg`;
 
   await promisify(fs.writeFile)(
     path.resolve(
@@ -301,36 +301,45 @@ const createGirlNFT = async () => {
   );
   const hairItem = chance.weighted(girl_hairs, girl_hair_weights);
 
-  spinner.info(`Using ${backgroundItem} as background`);
-  spinner.info(`Using ${bodyItem} as body`);
-  spinner.info(`Using ${footwearItem} as footwear`);
-  spinner.info(`Using ${pantItem} as pant`);
-  spinner.info(`Using ${shirtItem} as shirt`);
-  spinner.info(`Using ${accessoryItem} as accessory`);
-  spinner.info(`Using ${hairItem} as hair`);
+  // spinner.info(`Using ${backgroundItem} as background`);
+  // spinner.info(`Using ${bodyItem} as body`);
+  // spinner.info(`Using ${footwearItem} as footwear`);
+  // spinner.info(`Using ${pantItem} as pant`);
+  // spinner.info(`Using ${shirtItem} as shirt`);
+  // spinner.info(`Using ${accessoryItem} as accessory`);
+  // spinner.info(`Using ${hairItem} as hair`);
 
-  spinner.info("Writing .png file");
-  images(getLayerUri("boy", "background", backgroundItem))
-    .draw(images(getLayerUri("girl", "body", bodyItem)), 0, 0)
-    .draw(images(getLayerUri("girl", "shirt", shirtItem)), 0, 0)
-    .draw(images(getLayerUri("girl", "pant", pantItem)), 0, 0)
-    .draw(images(getLayerUri("girl", "footwear", footwearItem)), 0, 0)
-    .draw(images(getLayerUri("girl", "accessory", accessoryItem)), 0, 0)
-    .draw(images(getLayerUri("girl", "hair", hairItem)), 0, 0)
-    .save(
-      path.resolve(
-        __dirname,
-        "output",
-        `${CURRENT_GIRL_CONSECUTIVE.toString()}.jpg`
+  spinner.info("Writing .jpg file");
+  await new Promise<void>((res, reject) =>
+    images(getLayerUri("boy", "background", backgroundItem))
+      .draw(images(getLayerUri("girl", "body", bodyItem)), 0, 0)
+      .draw(images(getLayerUri("girl", "shirt", shirtItem)), 0, 0)
+      .draw(images(getLayerUri("girl", "pant", pantItem)), 0, 0)
+      .draw(images(getLayerUri("girl", "footwear", footwearItem)), 0, 0)
+      .draw(images(getLayerUri("girl", "accessory", accessoryItem)), 0, 0)
+      .draw(images(getLayerUri("girl", "hair", hairItem)), 0, 0)
+      .saveAsync(
+        path.resolve(
+          __dirname,
+          "output",
+          `${CURRENT_GIRL_CONSECUTIVE.toString()}.jpg`
+        ),
+        (err) => {
+          if (err) {
+            reject(err);
+          } else {
+            res();
+          }
+        }
       )
-    );
+  );
 
   spinner.info("Writing .json file");
   const templateClone = JSON.parse(
     JSON.stringify(JSON_TEMPLATE)
   ) as typeof JSON_TEMPLATE;
 
-  templateClone.name = `Metropolitan - ${CURRENT_BOY_CONSECUTIVE}`;
+  templateClone.name = `Metropolitan - ${CURRENT_GIRL_CONSECUTIVE}`;
   templateClone.attributes = [
     {
       trait_type: "background",
@@ -343,7 +352,7 @@ const createGirlNFT = async () => {
     { trait_type: "accessory", value: accessoryItem },
     { trait_type: "hair", value: hairItem },
   ];
-  templateClone.image = `${CURRENT_BOY_CONSECUTIVE}.png`;
+  templateClone.image = `${CURRENT_GIRL_CONSECUTIVE}.jpg`;
 
   await promisify(fs.writeFile)(
     path.resolve(
@@ -364,7 +373,7 @@ const createGirlNFT = async () => {
     await createBoyNFT();
     await createGirlNFT();
   } while (
-    CURRENT_BOY_CONSECUTIVE < TOTAL_BOY * 2 &&
-    CURRENT_GIRL_CONSECUTIVE < TOTAL_GIRL * 2 - 1
+    CURRENT_BOY_CONSECUTIVE < (TOTAL_BOY * 2) &&
+    CURRENT_GIRL_CONSECUTIVE < (TOTAL_GIRL * 2) - 1
   );
 })();
