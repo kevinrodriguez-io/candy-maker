@@ -45,7 +45,7 @@ var spinner = ora("Creating JSON Template").start();
 var JSON_TEMPLATE = {
     name: "",
     symbol: "",
-    image: "0.jpg",
+    image: "0.png",
     description: "Someone is coming to the city! Congratulations on getting your ticket to the Metropolis. https://metropolisproject.io",
     seller_fee_basis_points: 1200,
     attributes: [
@@ -58,7 +58,7 @@ var JSON_TEMPLATE = {
     properties: {
         files: [
             {
-                uri: "image.jpg",
+                uri: "metropolis.png",
                 type: "image/png",
             },
         ],
@@ -179,9 +179,9 @@ var girl_shirts = [
 var girl_shirt_weights = [15, 10, 35, 25, 10, 5];
 //#endregion
 spinner.succeed();
-var TOTAL_BOY = 15;
+var TOTAL_BOY = 1500;
 var ALL_BOY = [];
-var TOTAL_GIRL = 15;
+var TOTAL_GIRL = 1500;
 var ALL_GIRL = [];
 var CURRENT_BOY_CONSECUTIVE = 0;
 var CURRENT_GIRL_CONSECUTIVE = 1;
@@ -205,7 +205,7 @@ var createBoyNFT = function () { return __awaiter(void 0, void 0, void 0, functi
                 sweaterItem = chance.weighted(boy_sweaters, boy_sweater_weights);
                 accessoryItem = chance.weighted(boy_accessories, boy_accessory_weights);
                 hairItem = chance.weighted(boy_hairs, boy_hair_weights);
-                spinner.info("Writing .jpg file");
+                spinner.info("Writing .png file");
                 return [4 /*yield*/, new Promise(function (res, reject) {
                         return images(getLayerUri("boy", "background", backgroundItem))
                             .draw(images(getLayerUri("boy", "body", bodyItem)), 0, 0)
@@ -215,7 +215,7 @@ var createBoyNFT = function () { return __awaiter(void 0, void 0, void 0, functi
                             .draw(images(getLayerUri("boy", "sweater", sweaterItem)), 0, 0)
                             .draw(images(getLayerUri("boy", "accessory", accessoryItem)), 0, 0)
                             .draw(images(getLayerUri("boy", "hair", hairItem)), 0, 0)
-                            .saveAsync(path.resolve(__dirname, "output", CURRENT_BOY_CONSECUTIVE.toString() + ".jpg"), function (err) {
+                            .saveAsync(path.resolve(__dirname, "output", CURRENT_BOY_CONSECUTIVE.toString() + ".png"), function (err) {
                             if (err) {
                                 reject(err);
                             }
@@ -242,7 +242,7 @@ var createBoyNFT = function () { return __awaiter(void 0, void 0, void 0, functi
                     { trait_type: "accessory", value: accessoryItem },
                     { trait_type: "hair", value: hairItem },
                 ];
-                templateClone.image = CURRENT_BOY_CONSECUTIVE + ".jpg";
+                templateClone.image = CURRENT_BOY_CONSECUTIVE + ".png";
                 return [4 /*yield*/, promisify(fs.writeFile)(path.resolve(__dirname, "output", CURRENT_BOY_CONSECUTIVE.toString() + ".json"), JSON.stringify(templateClone, null, 2), "utf-8")];
             case 2:
                 _a.sent();
@@ -274,16 +274,16 @@ var createGirlNFT = function () { return __awaiter(void 0, void 0, void 0, funct
                 // spinner.info(`Using ${shirtItem} as shirt`);
                 // spinner.info(`Using ${accessoryItem} as accessory`);
                 // spinner.info(`Using ${hairItem} as hair`);
-                spinner.info("Writing .jpg file");
+                spinner.info("Writing .png file");
                 return [4 /*yield*/, new Promise(function (res, reject) {
                         return images(getLayerUri("boy", "background", backgroundItem))
                             .draw(images(getLayerUri("girl", "body", bodyItem)), 0, 0)
+                            .draw(images(getLayerUri("girl", "footwear", footwearItem)), 0, 0)
                             .draw(images(getLayerUri("girl", "shirt", shirtItem)), 0, 0)
                             .draw(images(getLayerUri("girl", "pant", pantItem)), 0, 0)
-                            .draw(images(getLayerUri("girl", "footwear", footwearItem)), 0, 0)
                             .draw(images(getLayerUri("girl", "accessory", accessoryItem)), 0, 0)
                             .draw(images(getLayerUri("girl", "hair", hairItem)), 0, 0)
-                            .saveAsync(path.resolve(__dirname, "output", CURRENT_GIRL_CONSECUTIVE.toString() + ".jpg"), function (err) {
+                            .saveAsync(path.resolve(__dirname, "output", CURRENT_GIRL_CONSECUTIVE.toString() + ".png"), function (err) {
                             if (err) {
                                 reject(err);
                             }
@@ -309,7 +309,7 @@ var createGirlNFT = function () { return __awaiter(void 0, void 0, void 0, funct
                     { trait_type: "accessory", value: accessoryItem },
                     { trait_type: "hair", value: hairItem },
                 ];
-                templateClone.image = CURRENT_GIRL_CONSECUTIVE + ".jpg";
+                templateClone.image = CURRENT_GIRL_CONSECUTIVE + ".png";
                 return [4 /*yield*/, promisify(fs.writeFile)(path.resolve(__dirname, "output", CURRENT_GIRL_CONSECUTIVE.toString() + ".json"), JSON.stringify(templateClone, null, 2), "utf-8")];
             case 2:
                 _a.sent();

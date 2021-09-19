@@ -28,7 +28,7 @@ const spinner = ora("Creating JSON Template").start();
 const JSON_TEMPLATE = {
   name: "",
   symbol: "",
-  image: "0.jpg",
+  image: "0.png",
   description:
     "Someone is coming to the city! Congratulations on getting your ticket to the Metropolis. https://metropolisproject.io",
   seller_fee_basis_points: 1200, // 1000 = 12%
@@ -42,7 +42,7 @@ const JSON_TEMPLATE = {
   properties: {
     files: [
       {
-        uri: "image.jpg",
+        uri: "metropolis.png",
         type: "image/png",
       },
     ],
@@ -187,10 +187,10 @@ const girl_shirt_weights = [15, 10, 35, 25, 10, 5];
 
 spinner.succeed();
 
-const TOTAL_BOY = 15;
+const TOTAL_BOY = 1500;
 const ALL_BOY: Array<typeof JSON_TEMPLATE> = [];
 
-const TOTAL_GIRL = 15;
+const TOTAL_GIRL = 1500;
 const ALL_GIRL: Array<typeof JSON_TEMPLATE> = [];
 
 let CURRENT_BOY_CONSECUTIVE = 0;
@@ -225,7 +225,7 @@ const createBoyNFT = async () => {
   const accessoryItem = chance.weighted(boy_accessories, boy_accessory_weights);
   const hairItem = chance.weighted(boy_hairs, boy_hair_weights);
 
-  spinner.info("Writing .jpg file");
+  spinner.info("Writing .png file");
   await new Promise<void>((res, reject) =>
     images(getLayerUri("boy", "background", backgroundItem))
       .draw(images(getLayerUri("boy", "body", bodyItem)), 0, 0)
@@ -239,7 +239,7 @@ const createBoyNFT = async () => {
         path.resolve(
           __dirname,
           "output",
-          `${CURRENT_BOY_CONSECUTIVE.toString()}.jpg`
+          `${CURRENT_BOY_CONSECUTIVE.toString()}.png`
         ),
         (err) => {
           if (err) {
@@ -270,7 +270,7 @@ const createBoyNFT = async () => {
     { trait_type: "accessory", value: accessoryItem },
     { trait_type: "hair", value: hairItem },
   ];
-  templateClone.image = `${CURRENT_BOY_CONSECUTIVE}.jpg`;
+  templateClone.image = `${CURRENT_BOY_CONSECUTIVE}.png`;
 
   await promisify(fs.writeFile)(
     path.resolve(
@@ -309,20 +309,20 @@ const createGirlNFT = async () => {
   // spinner.info(`Using ${accessoryItem} as accessory`);
   // spinner.info(`Using ${hairItem} as hair`);
 
-  spinner.info("Writing .jpg file");
+  spinner.info("Writing .png file");
   await new Promise<void>((res, reject) =>
     images(getLayerUri("boy", "background", backgroundItem))
       .draw(images(getLayerUri("girl", "body", bodyItem)), 0, 0)
+      .draw(images(getLayerUri("girl", "footwear", footwearItem)), 0, 0)
       .draw(images(getLayerUri("girl", "shirt", shirtItem)), 0, 0)
       .draw(images(getLayerUri("girl", "pant", pantItem)), 0, 0)
-      .draw(images(getLayerUri("girl", "footwear", footwearItem)), 0, 0)
       .draw(images(getLayerUri("girl", "accessory", accessoryItem)), 0, 0)
       .draw(images(getLayerUri("girl", "hair", hairItem)), 0, 0)
       .saveAsync(
         path.resolve(
           __dirname,
           "output",
-          `${CURRENT_GIRL_CONSECUTIVE.toString()}.jpg`
+          `${CURRENT_GIRL_CONSECUTIVE.toString()}.png`
         ),
         (err) => {
           if (err) {
@@ -352,7 +352,7 @@ const createGirlNFT = async () => {
     { trait_type: "accessory", value: accessoryItem },
     { trait_type: "hair", value: hairItem },
   ];
-  templateClone.image = `${CURRENT_GIRL_CONSECUTIVE}.jpg`;
+  templateClone.image = `${CURRENT_GIRL_CONSECUTIVE}.png`;
 
   await promisify(fs.writeFile)(
     path.resolve(
