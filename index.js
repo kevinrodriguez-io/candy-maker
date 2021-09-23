@@ -1,3 +1,9 @@
+/**
+ * Copyright 2021 - Kevin Rodriguez and Jungle Cats
+ * Please do not disclose this source code to anyone not allowed by either
+ * Kevin Rodriguez or Jungle Cats.
+ * Distributing copies of this piece of code is a violation of copyright law.
+ */
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
     return new (P || (P = Promise))(function (resolve, reject) {
@@ -40,182 +46,121 @@ import fs from "fs";
 import { promisify } from "util";
 import path from "path";
 import ora from "ora";
+import _ from "lodash";
+var DEV = true;
 var __dirname = path.resolve();
-var spinner = ora("Creating JSON Template").start();
+var globalSpinner = ora({
+    text: "Creating JSON Template",
+    isSilent: !DEV,
+}).start();
+/**
+ * GOTCHAS:
+ * #0 - NFT file names should be a zero-based consecutive number.
+ * #1 - PNG Files must be under 8MB I think, but it's HIGHLY desirable to keep them under 2MB.
+ * #2 - All creators in the creators array must sign the created NFTs, this is kind of a bummer but it's better in terms of trust.
+ *    - This way no one rugs no one, but it's still super important.
+ *    - Ideally, we don't have to share our private keys, what we do is:
+ *      - #1. Create a new keypair set for each creator.
+ *      - #2. Send the cache file to every creator.
+ *      - #3. Each creator signs the cache file using the metaplex cli. This sucks but it's the most transparent way to do it.
+ *    - If you don't sign the NFTs, bad stuff happen.
+ * #3 - File format must be png, i don't know why.
+ * #4 - InitialSaleHappenned field is a boolean, ideally is set to true but this will close update authority; Update authority is important if something bad happens we can fix it.
+ */
 var JSON_TEMPLATE = {
     name: "",
     symbol: "",
     image: "0.png",
-    description: "Someone is coming to the city! Congratulations on getting your ticket to the Metropolis. https://metropolisproject.io",
-    seller_fee_basis_points: 1200,
-    attributes: [
-    // { trait_type: "web", value: "yes", },
-    ],
+    description: "Welcome to the Jungle! Congratulations on getting your place in the Jungle Cats Family. https://junglecats.io",
+    seller_fee_basis_points: 500,
+    attributes: [],
     collection: {
-        name: "Metropolis GEN1",
-        family: "Metropolis",
+        name: "Jungle Cats",
+        family: "Originals",
     },
     properties: {
         files: [
             {
-                uri: "metropolis.png",
+                uri: "junglecats.png",
                 type: "image/png",
             },
         ],
         category: "image",
         creators: [
             {
-                address: "2dxeRwuUTpCULzCe48sQACRVrhD1aju9VUnFVWTYBU8z",
-                share: 100,
+                address: "JUNGLE_CATS_SPECIFIC_MINT_ADDRESS",
+                share: 90,
+            },
+            {
+                address: "OTHER_ADDRESS",
+                share: 10,
             },
         ],
     },
 };
-spinner.succeed();
-spinner.start("Creating layers and weights");
-var backgrounds = [
-    "baby_pink",
-    "city_blue",
-    "lemon_cream",
-    "mint_icecream",
-    "pale_yellow",
-];
-var background_weights = [20, 20, 20, 20, 20];
-// #region Boy stuff
-var boy_bodies = ["body_1", "body_2", "body_3", "body_4"];
-var boy_body_weights = [25, 25, 25, 25];
-var boy_footwear = ["blue", "green", "orange", "red", "white"];
-var boy_footwear_weights = [35, 35, 15, 10, 5];
-var boy_pants = [
-    "black_jeans",
-    "black_pants",
-    "blue_jeans",
-    "brown_cargos",
-    "gray_joggers",
-    "khaki_pants",
-];
-var boy_pant_weights = [5, 15, 35, 15, 20, 10];
-var boy_hairs = [
-    "black_mohawk_beard",
-    "long_black",
-    "long_brown",
-    "long_red",
-    "long_white_beard",
-    "short_blonde_beard",
-    "short_blonde",
-];
-var boy_hair_weights = [8, 30, 5, 5, 3, 19, 30];
-var boy_shirts = [
-    "black_shirt",
-    "black_solana",
-    "brown_shirt",
-    "red_shirt",
-    "white_shirt",
-    "white_tank_top",
-];
-var boy_shirt_weights = [7, 3, 15, 20, 30, 25];
-var boy_accessories = [
+globalSpinner.succeed();
+globalSpinner.start("Creating layers and weights");
+// #region JUNGLE_CAT layers stuff
+/**
+ * TODO: Modify accordingly to layers exported by Henzo
+ * This process uses the charged dice to generate a random layer.
+ * IMPORTANT: background_weights should add up to 100.
+ * TODO: Refactor into a nice object that uses {LayerType} as key.
+ */
+var backgrounds = ["jungle", "space"];
+var background_weights = [50, 50];
+var junglecat_bodies = ["white_lion", "lion"];
+var junglecat_body_weights = [50, 50];
+var junglecat_manes = ["long_black", "long_brown"];
+var junglecat_mane_weights = [50, 50];
+var junglecat_shirts = ["black_shirt", "white_tank_top"];
+var junglecat_shirt_weights = [50, 50];
+var junglecat_accessories = [
     "black_sunglasses",
     "black_eyepatch",
-    "glasses",
-    "red_hearts",
-    "white_sunglasses",
-    "none",
+    "none", // A none, empty layer should also be part of the weights otherwise everyone will have a feature.
 ];
-var boy_accessory_weights = [15, 10, 15, 5, 20, 35];
-var boy_sweaters = [
-    "black_sweater",
-    "black_white_pattern",
-    "red_sweater",
-    "yellow_sweater",
-    "no_sweater",
-];
-var boy_sweater_weights = [15, 5, 15, 10, 55];
+var junglecat_accessory_weights = [33, 33, 34];
 //#endregion
-//#region Girl stuff
-var girl_accessories = [
-    "black_sunglasses",
-    "glasses",
-    "pearl_necklace",
-    "round_glasses",
-    "solana_necklace",
-];
-var girl_accessory_weights = [30, 20, 10, 10, 30];
-var girl_bodies = ["body_1", "body_2", "body_3"];
-var girl_body_weights = [33, 33, 34];
-var girl_footwears = [
-    "black_ankle_boots",
-    "black_high_heels",
-    "red_ankle_boots",
-    "white_ankle_boots",
-    "white_high_heels",
-];
-var girl_footwear_weights = [27, 15, 27, 26, 5];
-var girl_hairs = [
-    "long_black_hair",
-    "long_light_blue_hair",
-    "long_orange_hair",
-    "pink_hair",
-    "short_maroon_hair",
-    "short_red_hair",
-];
-var girl_hair_weights = [30, 5, 20, 10, 25, 10];
-var girl_pants = [
-    "blue_pants",
-    "blue_skirt",
-    "green_pants",
-    "red_skirt",
-    "white_pants",
-];
-var girl_pant_weights = [40, 5, 20, 5, 30];
-var girl_shirts = [
-    "pink_sweatshirt",
-    "red_shirt",
-    "shouldless_black_blouse",
-    "strappy_blouse",
-    "turquoise_shirt",
-    "yellow_sweatshirt",
-];
-var girl_shirt_weights = [15, 10, 35, 25, 10, 5];
-//#endregion
-spinner.succeed();
-var TOTAL_BOY = 1500;
-var ALL_BOY = [];
-var TOTAL_GIRL = 1500;
-var ALL_GIRL = [];
-var CURRENT_BOY_CONSECUTIVE = 0;
-var CURRENT_GIRL_CONSECUTIVE = 1;
-var getLayerUri = function (pseudoGender, layerType, layerName) {
-    var layerUri = path.resolve(__dirname, "layers", pseudoGender, layerType, layerName + "." + (layerType === "background" ? "jpg" : "png"));
+globalSpinner.succeed();
+var TOTAL_JUNGLECATS = 30; // Change to appropiate number
+var ALL_JUNGLECATS = [];
+var getLayerUri = function (layerType, layerName) {
+    var spinner = ora({
+        text: "Building file from layer " + layerType + " and " + layerName,
+        isSilent: !DEV,
+    }).start();
+    var layerUri = path.resolve(__dirname, "layers", layerType, layerName + ".png");
     spinner.info("Got layerUri: " + layerUri);
     return "" + layerUri;
 };
-var createBoyNFT = function () { return __awaiter(void 0, void 0, void 0, function () {
-    var chance, backgroundItem, bodyItem, footwearItem, pantItem, shirtItem, sweaterItem, accessoryItem, hairItem, templateClone;
+var createJungleCatNFT = function (currentJunglecatConsecutive) { return __awaiter(void 0, void 0, void 0, function () {
+    var spinner, chance, backgroundItem, bodyItem, shirtItem, accessoryItem, maneItem, templateClone;
     return __generator(this, function (_a) {
         switch (_a.label) {
             case 0:
-                spinner.start("Initializing boy creation: " + CURRENT_BOY_CONSECUTIVE);
+                spinner = ora({
+                    text: "Creating JungleCat " + currentJunglecatConsecutive,
+                    isSilent: !DEV,
+                }).start();
                 chance = new Chance();
                 backgroundItem = chance.weighted(backgrounds, background_weights);
-                bodyItem = chance.weighted(boy_bodies, boy_body_weights);
-                footwearItem = chance.weighted(boy_footwear, boy_footwear_weights);
-                pantItem = chance.weighted(boy_pants, boy_pant_weights);
-                shirtItem = chance.weighted(boy_shirts, boy_shirt_weights);
-                sweaterItem = chance.weighted(boy_sweaters, boy_sweater_weights);
-                accessoryItem = chance.weighted(boy_accessories, boy_accessory_weights);
-                hairItem = chance.weighted(boy_hairs, boy_hair_weights);
-                spinner.info("Writing .png file");
+                bodyItem = chance.weighted(junglecat_bodies, junglecat_body_weights);
+                shirtItem = chance.weighted(junglecat_shirts, junglecat_shirt_weights);
+                accessoryItem = chance.weighted(junglecat_accessories, junglecat_accessory_weights);
+                maneItem = chance.weighted(junglecat_manes, junglecat_mane_weights);
+                spinner.info("Writing .png file for JungleCat - " + currentJunglecatConsecutive);
+                /**
+                 * SUPER IMPORTANT
+                 * - The order of layers is MATTERS, imagine putting them in photoshop or something like that.
+                 */
                 return [4 /*yield*/, new Promise(function (res, reject) {
-                        return images(getLayerUri("boy", "background", backgroundItem))
-                            .draw(images(getLayerUri("boy", "body", bodyItem)), 0, 0)
-                            .draw(images(getLayerUri("boy", "footwear", footwearItem)), 0, 0)
-                            .draw(images(getLayerUri("boy", "pant", pantItem)), 0, 0)
-                            .draw(images(getLayerUri("boy", "shirt", shirtItem)), 0, 0)
-                            .draw(images(getLayerUri("boy", "sweater", sweaterItem)), 0, 0)
-                            .draw(images(getLayerUri("boy", "accessory", accessoryItem)), 0, 0)
-                            .draw(images(getLayerUri("boy", "hair", hairItem)), 0, 0)
-                            .saveAsync(path.resolve(__dirname, "output", CURRENT_BOY_CONSECUTIVE.toString() + ".png"), function (err) {
+                        return images(getLayerUri("background", backgroundItem))
+                            .draw(images(getLayerUri("body", bodyItem)), 0, 0)
+                            .draw(images(getLayerUri("shirt", shirtItem)), 0, 0)
+                            .draw(images(getLayerUri("accessory", accessoryItem)), 0, 0)
+                            .draw(images(getLayerUri("mane", maneItem)), 0, 0)
+                            .saveAsync(path.resolve(__dirname, "output", currentJunglecatConsecutive.toString() + ".png"), function (err) {
                             if (err) {
                                 reject(err);
                             }
@@ -225,116 +170,61 @@ var createBoyNFT = function () { return __awaiter(void 0, void 0, void 0, functi
                         });
                     })];
             case 1:
+                /**
+                 * SUPER IMPORTANT
+                 * - The order of layers is MATTERS, imagine putting them in photoshop or something like that.
+                 */
                 _a.sent();
                 spinner.info("Writing .json file");
                 templateClone = JSON.parse(JSON.stringify(JSON_TEMPLATE));
-                templateClone.name = "Metropolitan - " + CURRENT_BOY_CONSECUTIVE;
+                templateClone.name = "Jungle Cats - #" + currentJunglecatConsecutive;
                 templateClone.attributes = [
+                    // These show up very nice in Phantom and other wallets.
                     {
                         trait_type: "background",
                         value: backgroundItem,
                     },
                     { trait_type: "body", value: bodyItem },
-                    { trait_type: "footwear", value: footwearItem },
-                    { trait_type: "pant", value: pantItem },
                     { trait_type: "shirt", value: shirtItem },
-                    { trait_type: "sweater", value: sweaterItem },
                     { trait_type: "accessory", value: accessoryItem },
-                    { trait_type: "hair", value: hairItem },
+                    { trait_type: "mane", value: maneItem },
                 ];
-                templateClone.image = CURRENT_BOY_CONSECUTIVE + ".png";
-                return [4 /*yield*/, promisify(fs.writeFile)(path.resolve(__dirname, "output", CURRENT_BOY_CONSECUTIVE.toString() + ".json"), JSON.stringify(templateClone, null, 2), "utf-8")];
+                templateClone.image = currentJunglecatConsecutive + ".png";
+                return [4 /*yield*/, promisify(fs.writeFile)(path.resolve(__dirname, "output", currentJunglecatConsecutive.toString() + ".json"), JSON.stringify(templateClone, null, 2), "utf-8")];
             case 2:
                 _a.sent();
                 spinner.succeed();
-                ALL_BOY.push(templateClone);
-                CURRENT_BOY_CONSECUTIVE += 2; // 2 Because we're intercalating boy-girl
-                return [2 /*return*/];
-        }
-    });
-}); };
-var createGirlNFT = function () { return __awaiter(void 0, void 0, void 0, function () {
-    var chance, backgroundItem, bodyItem, shirtItem, pantItem, footwearItem, accessoryItem, hairItem, templateClone;
-    return __generator(this, function (_a) {
-        switch (_a.label) {
-            case 0:
-                spinner.start("Initializing girl creation: " + CURRENT_GIRL_CONSECUTIVE);
-                chance = new Chance();
-                backgroundItem = chance.weighted(backgrounds, background_weights);
-                bodyItem = chance.weighted(girl_bodies, girl_body_weights);
-                shirtItem = chance.weighted(girl_shirts, girl_shirt_weights);
-                pantItem = chance.weighted(girl_pants, girl_pant_weights);
-                footwearItem = chance.weighted(girl_footwears, girl_footwear_weights);
-                accessoryItem = chance.weighted(girl_accessories, girl_accessory_weights);
-                hairItem = chance.weighted(girl_hairs, girl_hair_weights);
-                // spinner.info(`Using ${backgroundItem} as background`);
-                // spinner.info(`Using ${bodyItem} as body`);
-                // spinner.info(`Using ${footwearItem} as footwear`);
-                // spinner.info(`Using ${pantItem} as pant`);
-                // spinner.info(`Using ${shirtItem} as shirt`);
-                // spinner.info(`Using ${accessoryItem} as accessory`);
-                // spinner.info(`Using ${hairItem} as hair`);
-                spinner.info("Writing .png file");
-                return [4 /*yield*/, new Promise(function (res, reject) {
-                        return images(getLayerUri("boy", "background", backgroundItem))
-                            .draw(images(getLayerUri("girl", "body", bodyItem)), 0, 0)
-                            .draw(images(getLayerUri("girl", "footwear", footwearItem)), 0, 0)
-                            .draw(images(getLayerUri("girl", "shirt", shirtItem)), 0, 0)
-                            .draw(images(getLayerUri("girl", "pant", pantItem)), 0, 0)
-                            .draw(images(getLayerUri("girl", "accessory", accessoryItem)), 0, 0)
-                            .draw(images(getLayerUri("girl", "hair", hairItem)), 0, 0)
-                            .saveAsync(path.resolve(__dirname, "output", CURRENT_GIRL_CONSECUTIVE.toString() + ".png"), function (err) {
-                            if (err) {
-                                reject(err);
-                            }
-                            else {
-                                res();
-                            }
-                        });
-                    })];
-            case 1:
-                _a.sent();
-                spinner.info("Writing .json file");
-                templateClone = JSON.parse(JSON.stringify(JSON_TEMPLATE));
-                templateClone.name = "Metropolitan - " + CURRENT_GIRL_CONSECUTIVE;
-                templateClone.attributes = [
-                    {
-                        trait_type: "background",
-                        value: backgroundItem,
-                    },
-                    { trait_type: "body", value: bodyItem },
-                    { trait_type: "footwear", value: footwearItem },
-                    { trait_type: "pant", value: pantItem },
-                    { trait_type: "shirt", value: shirtItem },
-                    { trait_type: "accessory", value: accessoryItem },
-                    { trait_type: "hair", value: hairItem },
-                ];
-                templateClone.image = CURRENT_GIRL_CONSECUTIVE + ".png";
-                return [4 /*yield*/, promisify(fs.writeFile)(path.resolve(__dirname, "output", CURRENT_GIRL_CONSECUTIVE.toString() + ".json"), JSON.stringify(templateClone, null, 2), "utf-8")];
-            case 2:
-                _a.sent();
-                spinner.succeed();
-                ALL_GIRL.push(templateClone);
-                CURRENT_GIRL_CONSECUTIVE += 2; // 2 Because we're intercalating boy-girl
+                ALL_JUNGLECATS.push(templateClone);
                 return [2 /*return*/];
         }
     });
 }); };
 (function () { return __awaiter(void 0, void 0, void 0, function () {
+    var currentConsecutive, promises, promise, attrsAndIds, repeatedAttrs, repeated;
     return __generator(this, function (_a) {
         switch (_a.label) {
-            case 0: return [4 /*yield*/, createBoyNFT()];
+            case 0:
+                currentConsecutive = 0;
+                promises = [];
+                do {
+                    promise = createJungleCatNFT(currentConsecutive);
+                    promises.push(promise);
+                    currentConsecutive += 1;
+                } while (currentConsecutive < TOTAL_JUNGLECATS);
+                return [4 /*yield*/, Promise.all(promises)];
             case 1:
                 _a.sent();
-                return [4 /*yield*/, createGirlNFT()];
-            case 2:
-                _a.sent();
-                _a.label = 3;
-            case 3:
-                if (CURRENT_BOY_CONSECUTIVE < (TOTAL_BOY * 2) &&
-                    CURRENT_GIRL_CONSECUTIVE < (TOTAL_GIRL * 2) - 1) return [3 /*break*/, 0];
-                _a.label = 4;
-            case 4: return [2 /*return*/];
+                attrsAndIds = ALL_JUNGLECATS.map(function (i) { return ({
+                    id: i.name,
+                    attrs: JSON.stringify(i.attributes),
+                }); });
+                repeatedAttrs = _.filter(attrsAndIds.map(function (i) { return i.attrs; }), function (val, i, iteratee) { return _.includes(iteratee, val, i + 1); });
+                repeated = attrsAndIds.filter(function (i) {
+                    return repeatedAttrs.includes(i.attrs);
+                });
+                globalSpinner.info("Repeated items: " + JSON.stringify(repeated, null, 2));
+                globalSpinner.succeed();
+                return [2 /*return*/];
         }
     });
 }); })();
