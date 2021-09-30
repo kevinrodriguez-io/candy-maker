@@ -2,7 +2,7 @@
 
 # Candy Maker
 
-Metaplex compliant - generative art script.
+Solana Metaplex compliant - generative art script.
 I hope some day it becomes a fully fledged cli.
 
 ## Usage Instructions
