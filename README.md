@@ -2,6 +2,9 @@
 
 # Candy Maker
 
+Metaplex compliant - generative art script.
+I hope some day it becomes a fully fledged cli.
+
 ## Usage Instructions
 
 1. Modify `index.ts` to match your project.
