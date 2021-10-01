@@ -39,9 +39,9 @@ const globalSpinner = ora({
  * #4 - InitialSaleHappenned field is a boolean, ideally is set to true but this will close update authority; Update authority is important if something bad happens we can fix it.
  */
 const JSON_TEMPLATE = {
-  name: "",
+  name: "", // Modified by script
   symbol: "",
-  image: "0.png",
+  image: "0.png", /// Modified by script
   description: "Some description",
   seller_fee_basis_points: 500, // 500 = 5%
   attributes: [] as Attribute[],

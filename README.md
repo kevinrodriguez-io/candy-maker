@@ -5,7 +5,7 @@
 1. Modify `index.ts` to match your project.
 2. Run `yarn all`.
 
-### Constants
+### Constants to modify
 
 - `DEV` - Indicates whether to output logs or not.
 - `TOTAL_NFTITEMS` - Amount of Image/Metadata pairs to create.
