@@ -9,7 +9,7 @@ import _ from "lodash";
 const __dirname = path.resolve();
 
 const DEV = true;
-const TOTAL_NFTITEMS = 30; // Change to appropiate number
+const TOTAL_NFTITEMS = 10; // Change to appropiate number
 const ALL_NFTITEMS: Array<typeof JSON_TEMPLATE> = [];
 
 type LayerType = "background" | "body" | "accessory" | "beard" | "shirt"; // Matches the {folder} placed as in ./layers/{folder}
@@ -34,7 +34,7 @@ const globalSpinner = ora({
  *      - #1. Create a new keypair set for each creator.
  *      - #2. Send the cache file to every creator.
  *      - #3. Each creator signs the cache file using the metaplex cli. This sucks but it's the most transparent way to do it.
- *    - If you don't sign the NFTs, bad stuff happen.
+ *    - If you don't sign the NFTs after the initial drop, some people say bad stuff happen.
  * #3 - File format must be png, i don't know why.
  * #4 - InitialSaleHappenned field is a boolean, ideally is set to true but this will close update authority; Update authority is important if something bad happens we can fix it.
  */
